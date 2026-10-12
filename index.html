@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🧮 Sopa de Letras: Ecuaciones Lineales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --purple:#7C3AED;
+    --purple-dark:#5B21B6;
+    --pink:#F472B6;
+    --teal:#14B8A6;
+    --orange:#FB923C;
+    --yellow:#FBBF24;
+    --blue:#3B82F6;
+    --green:#22C55E;
+    --red:#EF4444;
+    --dark:#1E1B4B;
+    --card:#ffffff;
+    --radius:20px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Nunito',sans-serif;
+    min-height:100vh;
+    background:linear-gradient(135deg,#7C3AED 0%,#3B82F6 40%,#14B8A6 75%,#22C55E 100%);
+    background-size:300% 300%;
+    animation:gradientShift 18s ease infinite;
+    color:var(--dark);
+    position:relative;
+    overflow-x:hidden;
+  }
+  @keyframes gradientShift{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+  .bg-shapes{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;}
+  .bg-shapes span{
+    position:absolute;font-size:2.6rem;opacity:.18;
+    animation:floaty 9s ease-in-out infinite;
+    filter:drop-shadow(0 4px 4px rgba(0,0,0,.15));
+  }
+  @keyframes floaty{
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-40px) rotate(15deg);}
+  }
+  .container{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:20px 16px 60px;}
+  header{text-align:center;color:#fff;margin-bottom:18px;}
+  header h1{
+    font-family:'Baloo 2',cursive;
+    font-size:clamp(1.6rem,4vw,2.6rem);
+    margin:0 0 6px;
+    text-shadow:0 4px 12px rgba(0,0,0,.25);
+    letter-spacing:.5px;
+  }
+  header p.subtitle{
+    margin:0 auto;max-width:780px;
+    font-weight:600;font-size:clamp(.85rem,2vw,1.05rem);
+    background:rgba(255,255,255,.15);
+    padding:10px 16px;border-radius:14px;
+    backdrop-filter:blur(4px);
+    border:1px solid rgba(255,255,255,.25);
+  }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:0 12px 30px rgba(30,27,75,.25);
+    padding:18px;
+  }
+  .top-bar{
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .top-bar .field{
+    display:flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.92);
+    padding:8px 14px;border-radius:14px;
+    box-shadow:0 6px 16px rgba(0,0,0,.15);
+    font-weight:700;color:var(--purple-dark);
+  }
+  .top-bar input[type=text]{
+    border:none;outline:none;font-family:'Nunito',sans-serif;font-weight:700;
+    font-size:.95rem;color:var(--dark);width:150px;background:transparent;
+  }
+  .top-bar .field i{color:var(--pink);font-size:1.1rem;}
+  #timerBox i{color:var(--orange);}
+  #counterBox i{color:var(--teal);}
+  .btn{
+    border:none;cursor:pointer;font-family:'Baloo 2',cursive;font-weight:700;
+    font-size:1rem;padding:10px 22px;border-radius:16px;color:#fff;
+    background:linear-gradient(135deg,var(--orange),var(--pink));
+    box-shadow:0 8px 18px rgba(251,146,60,.45);
+    transition:transform .15s ease, box-shadow .15s ease;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 12px 22px rgba(251,146,60,.55);}
+  .btn:active{transform:translateY(0) scale(.98);}
+  .btn.secondary{background:linear-gradient(135deg,var(--blue),var(--teal));box-shadow:0 8px 18px rgba(59,130,246,.4);}
+
+  .info-card{margin-bottom:18px;}
+  .info-card h2{
+    font-family:'Baloo 2',cursive;color:var(--purple-dark);margin:0 0 10px;
+    font-size:1.2rem;display:flex;align-items:center;gap:8px;
+  }
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .info-grid ul{margin:6px 0 0;padding-left:20px;}
+  .info-grid li{margin-bottom:4px;font-weight:600;font-size:.92rem;}
+  .info-grid p{margin:4px 0 0;font-size:.92rem;font-weight:600;line-height:1.4;}
+  .badge{
+    display:inline-block;font-size:.72rem;font-weight:800;color:#fff;
+    background:var(--purple);padding:3px 10px;border-radius:20px;margin-bottom:6px;
+  }
+
+  .main-content{display:grid;grid-template-columns:2.1fr 1fr;gap:18px;align-items:start;}
+
+  .grid-wrap{display:flex;flex-direction:column;align-items:center;position:relative;}
+  .grid-overlay{
+    position:absolute;top:26px;left:26px;right:26px;bottom:26px;
+    background:rgba(255,255,255,.92);backdrop-filter:blur(3px);
+    border-radius:16px;display:flex;align-items:center;justify-content:center;
+    z-index:5;text-align:center;padding:20px;
+  }
+  .grid-overlay.hidden{display:none;}
+  .grid-overlay .overlay-content i{font-size:2.6rem;color:var(--purple);margin-bottom:10px;display:block;}
+  .grid-overlay .overlay-content p{font-family:'Baloo 2',cursive;font-size:1.1rem;color:var(--purple-dark);margin:0;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important;}
+  #grid{
+    display:grid;
+    grid-template-columns:repeat(15,1fr);
+    gap:2px;
+    width:100%;
+    max-width:620px;
+    aspect-ratio:1/1;
+    background:linear-gradient(135deg,#EDE9FE,#DBEAFE);
+    padding:8px;border-radius:16px;
+    box-shadow:inset 0 2px 10px rgba(0,0,0,.08);
+    touch-action:none;
+    user-select:none;
+  }
+  .cell{
+    display:flex;align-items:center;justify-content:center;
+    aspect-ratio:1/1;
+    background:#fff;
+    border-radius:5px;
+    font-weight:800;
+    font-size:clamp(9px,1.6vw,15px);
+    color:var(--purple-dark);
+    cursor:pointer;
+    transition:background .1s, color .1s, transform .1s;
+  }
+  .cell.selecting{background:var(--yellow)!important;color:#7c2d12;transform:scale(1.05);}
+  .cell.wrong{background:var(--red)!important;color:#fff;}
+
+  .side-panel{display:flex;flex-direction:column;gap:18px;}
+  .word-list-box h3, .winners-box h3{
+    font-family:'Baloo 2',cursive;color:var(--purple-dark);margin:0 0 10px;
+    font-size:1.05rem;display:flex;align-items:center;gap:8px;
+  }
+  #wordList{
+    list-style:none;margin:0;padding:0;
+    columns:2;column-gap:10px;
+    max-height:340px;overflow-y:auto;
+  }
+  #wordList li{
+    font-weight:700;font-size:.85rem;padding:5px 8px;margin-bottom:5px;
+    border-radius:8px;background:#F3F4F6;color:var(--dark);
+    break-inside:avoid;display:flex;align-items:center;gap:6px;
+  }
+  #wordList li i{font-size:.7rem;color:#9CA3AF;}
+  #wordList li.found{
+    text-decoration:line-through;color:#fff;
+    background:linear-gradient(135deg,var(--green),var(--teal));
+  }
+  #wordList li.found i{color:#fff;}
+
+  .winners-box table{width:100%;border-collapse:collapse;font-size:.82rem;}
+  .winners-box th{
+    text-align:left;background:var(--purple);color:#fff;padding:6px 8px;
+    font-family:'Baloo 2',cursive;font-size:.8rem;
+  }
+  .winners-box th:first-child{border-radius:8px 0 0 8px;}
+  .winners-box th:last-child{border-radius:0 8px 8px 0;}
+  .winners-box td{padding:6px 8px;border-bottom:1px solid #EEE;font-weight:700;}
+  .winners-box tr:nth-child(even) td{background:#FAF5FF;}
+  .winners-box .empty-msg{font-size:.85rem;font-weight:600;color:#9CA3AF;padding:8px 2px;}
+  .winners-box tr.gold td{background:linear-gradient(135deg,#FEF3C7,#FDE68A);}
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(30,27,75,.65);
+    display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;
+  }
+  .modal-overlay.hidden{display:none;}
+  .modal{
+    background:#fff;border-radius:22px;padding:30px 26px;max-width:420px;width:100%;
+    text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35);
+    animation:popIn .35s ease;
+  }
+  @keyframes popIn{from{transform:scale(.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .modal .trophy{font-size:3.2rem;margin-bottom:6px;}
+  .modal h2{font-family:'Baloo 2',cursive;color:var(--purple-dark);margin:0 0 8px;}
+  .modal p{font-weight:700;color:var(--dark);margin:4px 0;}
+  .modal .btn{margin-top:16px;}
+
+  footer{text-align:center;color:#fff;font-weight:600;font-size:.8rem;margin-top:30px;opacity:.85;}
+
+  .share-card{margin-top:18px;}
+  .share-card h2{
+    font-family:'Baloo 2',cursive;color:var(--purple-dark);margin:0 0 10px;
+    font-size:1.15rem;display:flex;align-items:center;gap:8px;
+  }
+  .share-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px;}
+  .share-row input[type=text]{
+    flex:1;min-width:220px;padding:10px 14px;border-radius:12px;
+    border:2px solid #E5E7EB;font-family:'Nunito',sans-serif;font-weight:700;
+    font-size:.9rem;outline:none;
+  }
+  .share-row input[type=text]:focus{border-color:var(--purple);}
+  .share-hint{font-size:.82rem;font-weight:600;color:#6B7280;margin:0 0 12px;line-height:1.5;}
+  #qrcode{
+    display:flex;justify-content:center;align-items:center;
+    background:#fff;padding:12px;border-radius:14px;width:fit-content;
+    box-shadow:0 6px 16px rgba(0,0,0,.12);min-height:40px;
+  }
+  #qrcode img{border-radius:6px;}
+  .share-note{font-size:.78rem;font-weight:700;color:#9CA3AF;margin-top:8px;}
+
+  @media (max-width:900px){
+    .main-content{grid-template-columns:1fr;}
+    .info-grid{grid-template-columns:1fr;}
+    #wordList{max-height:none;}
+    .top-bar{justify-content:center;}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-shapes" id="bgShapes"></div>
+
+<div class="container">
+
+  <header>
+    <h1>🧮 Sopa de Letras: Ecuaciones Lineales</h1>
+    <p class="subtitle">Aplica la aritmética y el manejo del álgebra para encontrar el valor de una incógnita en ecuaciones lineales que refieren a situaciones de interés.</p>
+  </header>
+
+  <div class="top-bar">
+    <div class="field">
+      <i class="fa-solid fa-user"></i>
+      <input type="text" id="playerName" placeholder="Nombre del participante" maxlength="20">
+    </div>
+    <div class="field" id="timerBox"><i class="fa-solid fa-stopwatch"></i> <span id="timerText">00:00</span></div>
+    <div class="field" id="counterBox"><i class="fa-solid fa-magnifying-glass"></i> <span id="counterText">0 / 0 encontradas</span></div>
+    <button class="btn" id="startBtn"><i class="fa-solid fa-play"></i> Iniciar juego</button>
+    <button class="btn" id="restartBtn"><i class="fa-solid fa-rotate-right"></i> Reiniciar juego</button>
+  </div>
+
+  <div class="card info-card">
+    <h2><i class="fa-solid fa-book-open"></i> Instrucciones y contenidos</h2>
+    <div class="info-grid">
+      <div>
+        <span class="badge">CÓMO JUGAR</span>
+        <ul>
+          <li>Escribe tu nombre en el campo de participante.</li>
+          <li>Haz clic (o toca) y arrastra sobre las letras para formar una palabra.</li>
+          <li>Las palabras pueden estar en horizontal, vertical o diagonal, en ambos sentidos.</li>
+          <li>Cada palabra encontrada se marca en la lista y en el tablero.</li>
+          <li>¡Encuentra todas las palabras para completar el reto y aparecer en el tablero de ganadores!</li>
+        </ul>
+      </div>
+      <div>
+        <span class="badge">CONTENIDOS FORMATIVOS</span>
+        <p>📘 Concepto de ecuación y sus partes<br>
+        📗 Ecuaciones lineales de primer grado<br>
+        📙 Procedimiento para encontrar el valor de una incógnita<br>
+        📕 Forma estándar de las ecuaciones lineales</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="card grid-wrap">
+      <div id="grid"></div>
+      <div class="grid-overlay" id="gridOverlay">
+        <div class="overlay-content">
+          <i class="fa-solid fa-play"></i>
+          <p id="overlayText">Presiona "Iniciar juego" para comenzar</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-panel">
+      <div class="card word-list-box">
+        <h3><i class="fa-solid fa-list-check"></i> Palabras a encontrar</h3>
+        <ul id="wordList"></ul>
+      </div>
+
+      <div class="card winners-box">
+        <h3><i class="fa-solid fa-trophy"></i> Tablero de ganadores</h3>
+        <p style="margin:0 0 10px;font-size:.78rem;font-weight:700;color:#9CA3AF;">
+          <i class="fa-solid fa-floppy-disk"></i> Se guarda automáticamente en este navegador.
+          <button id="clearWinnersBtn" style="border:none;background:none;color:var(--red);font-weight:800;cursor:pointer;text-decoration:underline;font-size:.78rem;">Borrar tablero</button>
+        </p>
+        <table id="winnersTable">
+          <thead>
+            <tr><th>#</th><th>Nombre</th><th>Palabras</th><th>Tiempo</th></tr>
+          </thead>
+          <tbody id="winnersBody"></tbody>
+        </table>
+        <div class="empty-msg" id="winnersEmpty">Aún no hay ganadores. ¡Sé el primero!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card share-card">
+    <h2><i class="fa-solid fa-qrcode"></i> Compartir la sopa de letras</h2>
+    <p class="share-hint">
+      Pega aquí el enlace público donde está publicada esta página (el enlace para compartir de Claude,
+      o la dirección de GitHub Pages / Netlify si la subiste tú) y genera un código QR para que otros
+      accedan desde su celular u otro computador con el mismo tablero de ganadores.
+    </p>
+    <div class="share-row">
+      <input type="text" id="shareUrl" placeholder="https://...">
+      <button class="btn secondary" id="genQrBtn"><i class="fa-solid fa-qrcode"></i> Generar QR</button>
+    </div>
+    <div id="qrcode"></div>
+    <p class="share-note" id="storageNote"></p>
+  </div>
+
+  <footer>Formación en álgebra • Ecuaciones lineales de primer grado</footer>
+</div>
+
+<div class="modal-overlay hidden" id="winModal">
+  <div class="modal">
+    <div class="trophy">🏆</div>
+    <h2>¡Felicitaciones!</h2>
+    <p id="winText"></p>
+    <p>Encontraste <span id="winWords"></span> palabras en <span id="winTime"></span></p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+      <button class="btn secondary" id="finishBtn"><i class="fa-solid fa-flag-checkered"></i> Finalizar</button>
+      <button class="btn" id="playAgainBtn"><i class="fa-solid fa-rotate-right"></i> Jugar otra vez</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ======================= BANCO DE 100 PALABRAS ======================= */
+const WORD_BANK = [
+"ECUACION","INCOGNITA","VARIABLE","COEFICIENTE","CONSTANTE","IGUALDAD","MIEMBRO","TERMINO","SIGNO","EXPRESION",
+"FORMULA","VALOR","NUMERO","ELEMENTO","SIMBOLO","LETRA","DATO","BALANZA","EQUILIBRIO","IDENTIDAD",
+"RELACION","CANTIDAD","MAGNITUD","UNIDAD","PARTE","LINEAL","GRADO","ALGEBRA","ARITMETICA","MATEMATICA",
+"POLINOMIO","MONOMIO","BINOMIO","EXPONENTE","BASE","POTENCIA","FUNCION","GRAFICA","RECTA","PENDIENTE",
+"PUNTO","EJE","PLANO","ORDENADA","ABSCISA","DOMINIO","RANGO","PROPORCION","RAZON","ENTERO",
+"DESPEJAR","DESPEJE","SOLUCION","PROCEDIMIENTO","METODO","PASO","REGLA","PROPIEDAD","TRANSPOSICION","SUSTITUCION",
+"EVALUACION","VERIFICACION","COMPROBACION","OPERACION","SUMA","RESTA","MULTIPLICACION","DIVISION","SIMPLIFICAR","REDUCIR",
+"AGRUPAR","FACTOR","FACTORIZAR","CALCULO","RESULTADO","ESTANDAR","FORMA","SISTEMA","DESIGUALDAD","INECUACION",
+"MODELO","PROBLEMA","SITUACION","CONTEXTO","INTERES","PLANTEAMIENTO","ANALISIS","EDAD","DINERO","PRECIO",
+"DESCUENTO","GANANCIA","PERDIDA","VELOCIDAD","DISTANCIA","TIEMPO","PERIMETRO","AREA","VOLUMEN","DECIMAL"
+];
+
+const SIZE = 15;
+const WORDS_PER_ROUND = 15;
+const COLORS = ["#F472B6","#FB923C","#FBBF24","#22C55E","#14B8A6","#3B82F6","#7C3AED","#EF4444","#EC4899","#10B981","#0EA5E9","#A855F7"];
+const DIRECTIONS = [
+  [0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]
+];
+
+const WINNERS_KEY = "sopaLetrasEcuaciones_ganadores";
+const CLEAR_PASSWORD = "PROFE2024";
+
+let gridData = [];
+let placedWords = [];   // {word, cells:[{r,c}]}
+let foundWords = new Set();
+let winners = [];
+let startTime = null;
+let timerInterval = null;
+let isSelecting = false;
+let startCell = null;
+let currentPath = [];
+let gameStarted = false;
+let gameFinished = false;
+
+/* ======================= DECORATIVE FLOATING ICONS ======================= */
+function buildBackground(){
+  const icons = ["➕","➖","✖️","➗","🟰","📐","🔢","📏","∑","x²"];
+  const wrap = document.getElementById('bgShapes');
+  wrap.innerHTML = "";
+  for(let i=0;i<16;i++){
+    const s = document.createElement('span');
+    s.textContent = icons[Math.floor(Math.random()*icons.length)];
+    s.style.left = Math.random()*96+"%";
+    s.style.top = Math.random()*96+"%";
+    s.style.animationDelay = (Math.random()*6)+"s";
+    s.style.animationDuration = (7+Math.random()*6)+"s";
+    wrap.appendChild(s);
+  }
+}
+
+/* ======================= PERSISTENCIA DE GANADORES ======================= */
+const WINNERS_STORAGE_KEY = "winners"; // clave para window.storage (compartida entre dispositivos)
+let cloudAvailable = false;
+
+async function loadWinners(){
+  // 1. Intentar leer del almacenamiento compartido en la nube (sincroniza entre dispositivos)
+  try{
+    if(window.storage){
+      const result = await window.storage.get(WINNERS_STORAGE_KEY, true);
+      if(result && result.value){
+        const parsed = JSON.parse(result.value);
+        if(Array.isArray(parsed)) winners = parsed;
+      }
+      cloudAvailable = true;
+      updateStorageNote();
+      renderWinners();
+      return;
+    }
+  }catch(err){
+    // La clave aún no existe en la nube o no hay conexión; seguimos con respaldo local
+    cloudAvailable = !!window.storage;
+  }
+  // 2. Respaldo: almacenamiento local del dispositivo
+  try{
+    const raw = localStorage.getItem(WINNERS_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed)) winners = parsed;
+    }
+  }catch(err){
+    console.warn("No se pudo leer el tablero de ganadores guardado.", err);
+  }
+  updateStorageNote();
+  renderWinners();
+}
+
+async function saveWinners(){
+  try{
+    if(window.storage){
+      await window.storage.set(WINNERS_STORAGE_KEY, JSON.stringify(winners), true);
+      cloudAvailable = true;
+    }
+  }catch(err){
+    console.warn("No se pudo guardar en la nube, se usará solo almacenamiento local.", err);
+  }
+  try{
+    localStorage.setItem(WINNERS_KEY, JSON.stringify(winners));
+  }catch(err){
+    console.warn("No se pudo guardar el tablero de ganadores localmente.", err);
+  }
+  updateStorageNote();
+}
+
+async function clearWinners(){
+  winners = [];
+  try{ if(window.storage) await window.storage.delete(WINNERS_STORAGE_KEY, true); }catch(err){}
+  try{ localStorage.removeItem(WINNERS_KEY); }catch(err){}
+  renderWinners();
+}
+
+function updateStorageNote(){
+  const note = document.getElementById('storageNote');
+  if(!note) return;
+  note.innerHTML = cloudAvailable
+    ? '<i class="fa-solid fa-cloud"></i> Tablero sincronizado entre dispositivos.'
+    : '<i class="fa-solid fa-desktop"></i> Guardado solo en este dispositivo/navegador (sin sincronización en la nube).';
+}
+
+/* ======================= UTILS ======================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function emptyGrid(){
+  return Array.from({length:SIZE},()=>Array.from({length:SIZE},()=>""));
+}
+
+function fits(grid,word,row,col,dr,dc){
+  for(let i=0;i<word.length;i++){
+    const r = row+dr*i, c = col+dc*i;
+    if(r<0||r>=SIZE||c<0||c>=SIZE) return false;
+    const cur = grid[r][c];
+    if(cur!=="" && cur!==word[i]) return false;
+  }
+  return true;
+}
+
+function placeWord(grid,word){
+  const dirs = shuffle(DIRECTIONS);
+  for(let attempt=0;attempt<250;attempt++){
+    const dir = dirs[attempt % dirs.length];
+    const row = Math.floor(Math.random()*SIZE);
+    const col = Math.floor(Math.random()*SIZE);
+    if(fits(grid,word,row,col,dir[0],dir[1])){
+      const cells = [];
+      for(let i=0;i<word.length;i++){
+        const r = row+dir[0]*i, c = col+dir[1]*i;
+        grid[r][c] = word[i];
+        cells.push({r,c});
+      }
+      return cells;
+    }
+  }
+  return null;
+}
+
+function buildPuzzle(){
+  const grid = emptyGrid();
+  const placed = [];
+  const candidates = shuffle(WORD_BANK).filter(w=>w.length<=SIZE);
+  for(const w of candidates){
+    if(placed.length>=WORDS_PER_ROUND) break;
+    const cells = placeWord(grid,w);
+    if(cells) placed.push({word:w,cells});
+  }
+  const ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for(let r=0;r<SIZE;r++){
+    for(let c=0;c<SIZE;c++){
+      if(grid[r][c]==="") grid[r][c] = ALPHA[Math.floor(Math.random()*ALPHA.length)];
+    }
+  }
+  return {grid, placed};
+}
+
+/* ======================= RENDER ======================= */
+function renderGrid(){
+  const el = document.getElementById('grid');
+  el.innerHTML = "";
+  for(let r=0;r<SIZE;r++){
+    for(let c=0;c<SIZE;c++){
+      const div = document.createElement('div');
+      div.className = "cell";
+      div.textContent = gridData[r][c];
+      div.dataset.r = r;
+      div.dataset.c = c;
+      el.appendChild(div);
+    }
+  }
+}
+
+function renderWordList(){
+  const ul = document.getElementById('wordList');
+  ul.innerHTML = "";
+  placedWords.forEach(pw=>{
+    const li = document.createElement('li');
+    li.id = "word-"+pw.word;
+    li.innerHTML = '<i class="fa-solid fa-circle"></i> ' + pw.word;
+    ul.appendChild(li);
+  });
+  updateCounter();
+}
+
+function updateCounter(){
+  document.getElementById('counterText').textContent = foundWords.size + " / " + placedWords.length + " encontradas";
+}
+
+function renderWinners(){
+  const body = document.getElementById('winnersBody');
+  const emptyMsg = document.getElementById('winnersEmpty');
+  const sorted = winners.slice().sort((a,b)=>a.seconds-b.seconds).slice(0,10);
+  body.innerHTML = "";
+  if(sorted.length===0){
+    emptyMsg.style.display = "block";
+  } else {
+    emptyMsg.style.display = "none";
+    sorted.forEach((w,i)=>{
+      const tr = document.createElement('tr');
+      if(i===0) tr.className = "gold";
+      tr.innerHTML = `<td>${i+1}</td><td>${w.name}</td><td>${w.words}</td><td>${w.time}</td>`;
+      body.appendChild(tr);
+    });
+  }
+}
+
+/* ======================= TIMER ======================= */
+function formatTime(totalSeconds){
+  const m = Math.floor(totalSeconds/60).toString().padStart(2,"0");
+  const s = (totalSeconds%60).toString().padStart(2,"0");
+  return m+":"+s;
+}
+function startTimer(){
+  stopTimer();
+  startTime = Date.now();
+  timerInterval = setInterval(()=>{
+    const secs = Math.floor((Date.now()-startTime)/1000);
+    document.getElementById('timerText').textContent = formatTime(secs);
+  },1000);
+}
+function stopTimer(){
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+/* ======================= SELECTION LOGIC ======================= */
+function cellEl(r,c){
+  return document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+}
+
+function computePath(start,end){
+  const dr = end.r - start.r;
+  const dc = end.c - start.c;
+  const steps = Math.max(Math.abs(dr),Math.abs(dc));
+  if(steps===0) return [start];
+  const stepR = dr===0?0:dr/Math.abs(dr);
+  const stepC = dc===0?0:dc/Math.abs(dc);
+  const isStraight = dr===0 || dc===0 || Math.abs(dr)===Math.abs(dc);
+  if(!isStraight) return null;
+  const path = [];
+  for(let i=0;i<=steps;i++){
+    path.push({r:start.r+stepR*i, c:start.c+stepC*i});
+  }
+  return path;
+}
+
+function clearHighlight(){
+  document.querySelectorAll('.cell.selecting, .cell.wrong').forEach(el=>{
+    el.classList.remove('selecting');
+    el.classList.remove('wrong');
+  });
+}
+
+function highlightPath(path){
+  clearHighlight();
+  path.forEach(p=>{
+    const el = cellEl(p.r,p.c);
+    if(el) el.classList.add('selecting');
+  });
+}
+
+function pathToWord(path){
+  return path.map(p=>gridData[p.r][p.c]).join("");
+}
+
+function sameCells(a,b){
+  if(a.length!==b.length) return false;
+  return a.every((p,i)=>p.r===b[i].r && p.c===b[i].c);
+}
+
+function finalizeSelection(){
+  if(currentPath.length>1){
+    const word = pathToWord(currentPath);
+    const reversed = word.split("").reverse().join("");
+    const match = placedWords.find(pw=>
+      !foundWords.has(pw.word) &&
+      (sameCells(pw.cells,currentPath) || sameCells(pw.cells.slice().reverse(),currentPath))
+    );
+    if(match && (match.word===word || match.word===reversed)){
+      markFound(match);
+    } else {
+      document.querySelectorAll('.cell.selecting').forEach(el=>{
+        el.classList.remove('selecting');
+        el.classList.add('wrong');
+      });
+      setTimeout(clearHighlight,350);
+    }
+  } else {
+    clearHighlight();
+  }
+  isSelecting = false;
+  startCell = null;
+  currentPath = [];
+}
+
+function markFound(match){
+  foundWords.add(match.word);
+  const color = COLORS[(foundWords.size-1) % COLORS.length];
+  match.cells.forEach(p=>{
+    const el = cellEl(p.r,p.c);
+    if(el){
+      el.classList.remove('selecting');
+      el.style.background = color;
+      el.style.color = "#fff";
+    }
+  });
+  const li = document.getElementById("word-"+match.word);
+  if(li){
+    li.classList.add('found');
+    li.querySelector('i').className = "fa-solid fa-circle-check";
+  }
+  updateCounter();
+  if(foundWords.size === placedWords.length){
+    onGameComplete();
+  }
+}
+
+function onGameComplete(){
+  stopTimer();
+  const secs = Math.floor((Date.now()-startTime)/1000);
+  const timeStr = formatTime(secs);
+  const name = (document.getElementById('playerName').value || "Jugador").trim().slice(0,20);
+  winners.push({name:name, words:placedWords.length, time:timeStr, seconds:secs});
+  saveWinners();
+  renderWinners();
+  document.getElementById('winText').textContent = name + ", ¡completaste el reto!";
+  document.getElementById('winWords').textContent = placedWords.length;
+  document.getElementById('winTime').textContent = timeStr;
+  document.getElementById('winModal').classList.remove('hidden');
+}
+
+/* ======================= EVENTS ======================= */
+function attachEvents(){
+  const grid = document.getElementById('grid');
+
+  grid.addEventListener('mousedown', e=>{
+    if(!gameStarted || gameFinished) return;
+    const cell = e.target.closest('.cell');
+    if(!cell) return;
+    isSelecting = true;
+    startCell = {r:+cell.dataset.r, c:+cell.dataset.c};
+    currentPath = [startCell];
+    highlightPath(currentPath);
+  });
+
+  grid.addEventListener('mouseover', e=>{
+    if(!isSelecting) return;
+    const cell = e.target.closest('.cell');
+    if(!cell) return;
+    const end = {r:+cell.dataset.r, c:+cell.dataset.c};
+    const path = computePath(startCell,end);
+    if(path){
+      currentPath = path;
+      highlightPath(currentPath);
+    }
+  });
+
+  document.addEventListener('mouseup', ()=>{
+    if(isSelecting) finalizeSelection();
+  });
+
+  grid.addEventListener('touchstart', e=>{
+    if(!gameStarted || gameFinished) return;
+    const touch = e.touches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const cell = target ? target.closest('.cell') : null;
+    if(!cell) return;
+    isSelecting = true;
+    startCell = {r:+cell.dataset.r, c:+cell.dataset.c};
+    currentPath = [startCell];
+    highlightPath(currentPath);
+  }, {passive:true});
+
+  grid.addEventListener('touchmove', e=>{
+    if(!isSelecting) return;
+    const touch = e.touches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const cell = target ? target.closest('.cell') : null;
+    if(!cell) return;
+    const end = {r:+cell.dataset.r, c:+cell.dataset.c};
+    const path = computePath(startCell,end);
+    if(path){
+      currentPath = path;
+      highlightPath(currentPath);
+    }
+    e.preventDefault();
+  }, {passive:false});
+
+  grid.addEventListener('touchend', ()=>{
+    if(isSelecting) finalizeSelection();
+  });
+
+  document.getElementById('restartBtn').addEventListener('click', initGame);
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+
+  document.getElementById('finishBtn').addEventListener('click', ()=>{
+    document.getElementById('winModal').classList.add('hidden');
+    finishGame();
+  });
+
+  document.getElementById('playAgainBtn').addEventListener('click', ()=>{
+    document.getElementById('winModal').classList.add('hidden');
+    initGame();
+  });
+
+  document.getElementById('genQrBtn').addEventListener('click', ()=>{
+    const url = document.getElementById('shareUrl').value.trim();
+    const qrBox = document.getElementById('qrcode');
+    qrBox.innerHTML = "";
+    if(!url || !/^https?:\/\//i.test(url)){
+      alert("Ingresa un enlace público válido que comience con http:// o https://");
+      return;
+    }
+    new QRCode(qrBox, {
+      text: url,
+      width: 180,
+      height: 180,
+      colorDark: "#1E1B4B",
+      colorLight: "#ffffff"
+    });
+  });
+  document.getElementById('clearWinnersBtn').addEventListener('click', ()=>{
+    const pwd = prompt("Ingresa la contraseña para borrar el tablero de ganadores:");
+    if(pwd === null) return;
+    if(pwd !== CLEAR_PASSWORD){
+      alert("Contraseña incorrecta. No se borró el tablero.");
+      return;
+    }
+    if(confirm("¿Seguro que deseas borrar todo el tablero de ganadores guardado?")){
+      clearWinners();
+    }
+  });
+}
+
+/* ======================= INIT / FLUJO DE JUEGO ======================= */
+function initGame(){
+  document.getElementById('winModal').classList.add('hidden');
+  clearHighlight();
+  foundWords = new Set();
+  isSelecting = false;
+  startCell = null;
+  currentPath = [];
+  gameStarted = false;
+  gameFinished = false;
+
+  const puzzle = buildPuzzle();
+  gridData = puzzle.grid;
+  placedWords = puzzle.placed;
+
+  renderGrid();
+  renderWordList();
+  stopTimer();
+  document.getElementById('timerText').textContent = "00:00";
+
+  const overlay = document.getElementById('gridOverlay');
+  const overlayText = document.getElementById('overlayText');
+  overlayText.textContent = 'Presiona "Iniciar juego" para comenzar';
+  overlay.classList.remove('hidden');
+
+  const startBtn = document.getElementById('startBtn');
+  startBtn.disabled = false;
+  startBtn.innerHTML = '<i class="fa-solid fa-play"></i> Iniciar juego';
+}
+
+function startGame(){
+  if(gameStarted || gameFinished) return;
+  gameStarted = true;
+  document.getElementById('gridOverlay').classList.add('hidden');
+  const startBtn = document.getElementById('startBtn');
+  startBtn.disabled = true;
+  startBtn.innerHTML = '<i class="fa-solid fa-check"></i> Juego en curso';
+  startTimer();
+}
+
+function finishGame(){
+  gameFinished = true;
+  stopTimer();
+  const overlay = document.getElementById('gridOverlay');
+  const overlayText = document.getElementById('overlayText');
+  overlayText.textContent = "Juego finalizado. ¡Gracias por participar! Presiona \"Reiniciar juego\" para jugar de nuevo.";
+  overlay.classList.remove('hidden');
+  const startBtn = document.getElementById('startBtn');
+  startBtn.disabled = true;
+  startBtn.innerHTML = '<i class="fa-solid fa-flag-checkered"></i> Finalizado';
+}
+
+buildBackground();
+attachEvents();
+if(/^https?:\/\//i.test(window.location.href)){
+  document.getElementById('shareUrl').value = window.location.href;
+}
+loadWinners().then(initGame).catch(initGame);
+</script>
+</body>
+</html>
